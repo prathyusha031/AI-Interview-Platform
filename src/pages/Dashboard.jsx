@@ -13,46 +13,91 @@ function Dashboard() {
   const totalInterviews = history.length;
 
   const averageScore =
-    history.length > 0
+    totalInterviews > 0
       ? (
           history.reduce(
             (sum, item) => sum + item.score,
             0
-          ) / history.length
+          ) / totalInterviews
         ).toFixed(1)
       : 0;
 
   const bestScore =
-    history.length > 0
-      ? Math.max(...history.map((item) => item.score))
+    totalInterviews > 0
+      ? Math.max(
+          ...history.map((item) => item.score)
+        )
       : 0;
 
   return (
     <div style={{ padding: "40px" }}>
       <h1>Performance Dashboard</h1>
 
-      <h2>Total Interviews: {totalInterviews}</h2>
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          marginTop: "20px",
+          flexWrap: "wrap",
+        }}
+      >
+        <div
+          style={{
+            border: "1px solid #ddd",
+            padding: "20px",
+            borderRadius: "10px",
+            minWidth: "200px",
+          }}
+        >
+          <h3>Total Interviews</h3>
+          <p>{totalInterviews}</p>
+        </div>
 
-      <h2>Average Score: {averageScore}/10</h2>
+        <div
+          style={{
+            border: "1px solid #ddd",
+            padding: "20px",
+            borderRadius: "10px",
+            minWidth: "200px",
+          }}
+        >
+          <h3>Average Score</h3>
+          <p>{averageScore}/10</p>
+        </div>
 
-      <h2>Best Score: {bestScore}/10</h2>
+        <div
+          style={{
+            border: "1px solid #ddd",
+            padding: "20px",
+            borderRadius: "10px",
+            minWidth: "200px",
+          }}
+        >
+          <h3>Best Score</h3>
+          <p>{bestScore}/10</p>
+        </div>
+      </div>
 
-      <hr />
+      <h2 style={{ marginTop: "40px" }}>
+        Interview History
+      </h2>
 
-      <h2>Interview History</h2>
-
-      {history.length === 0 ? (
-        <p>No interviews yet.</p>
-      ) : (
+      {history.length > 0 ? (
         history.map((item, index) => (
           <div
             key={index}
             style={{
               border: "1px solid #ddd",
               padding: "15px",
-              marginBottom: "10px",
+              borderRadius: "10px",
+              marginBottom: "15px",
+              marginTop: "15px",
             }}
           >
+            <p>
+              <strong>Role:</strong> {item.role}
+            </p>
+
             <p>
               <strong>Date:</strong> {item.date}
             </p>
@@ -60,8 +105,15 @@ function Dashboard() {
             <p>
               <strong>Score:</strong> {item.score}/10
             </p>
+
+            <p>
+              <strong>Question:</strong>{" "}
+              {item.question}
+            </p>
           </div>
         ))
+      ) : (
+        <p>No interviews yet.</p>
       )}
     </div>
   );

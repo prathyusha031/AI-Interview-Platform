@@ -10,13 +10,19 @@ function Interview() {
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [selectedRole, setSelectedRole] = useState("");
+
   const handleGenerate = async (topic) => {
     setLoading(true);
+
+    setSelectedRole(topic);
     setFeedback("");
     setAnswer("");
+    setQuestion("");
 
     try {
       const result = await generateQuestions(topic);
+
       setQuestion(result);
     } catch (error) {
       console.error(error);
@@ -46,8 +52,8 @@ function Interview() {
         result.match(/Score:\s*(\d+)\/10/i);
 
       const score = scoreMatch
-        ? scoreMatch[1]
-        : "0";
+        ? Number(scoreMatch[1])
+        : 0;
 
       const history =
         JSON.parse(
@@ -55,8 +61,9 @@ function Interview() {
         ) || [];
 
       history.push({
-        role: question,
-        score: Number(score),
+        role: selectedRole,
+        question: question,
+        score: score,
         date: new Date().toLocaleDateString(),
       });
 
@@ -66,7 +73,9 @@ function Interview() {
       );
     } catch (error) {
       console.error(error);
-      setFeedback("Failed to evaluate answer.");
+      setFeedback(
+        "Failed to evaluate answer."
+      );
     }
 
     setLoading(false);
@@ -78,7 +87,9 @@ function Interview() {
 
       <h3>Select Interview Type</h3>
 
-      <button onClick={() => handleGenerate("Python")}>
+      <button
+        onClick={() => handleGenerate("Python")}
+      >
         Python
       </button>
 
@@ -90,7 +101,9 @@ function Interview() {
       </button>
 
       <button
-        onClick={() => handleGenerate("Data Science")}
+        onClick={() =>
+          handleGenerate("Data Science")
+        }
         style={{ marginLeft: "10px" }}
       >
         Data Science
@@ -103,7 +116,18 @@ function Interview() {
         HR
       </button>
 
-      {loading && <p>Loading...</p>}
+      {selectedRole && (
+        <p style={{ marginTop: "15px" }}>
+          <strong>Selected:</strong>{" "}
+          {selectedRole}
+        </p>
+      )}
+
+      {loading && (
+        <p style={{ marginTop: "20px" }}>
+          Loading...
+        </p>
+      )}
 
       {question && (
         <div style={{ marginTop: "30px" }}>
@@ -112,8 +136,8 @@ function Interview() {
           <p>{question}</p>
 
           <textarea
-            rows="6"
-            cols="70"
+            rows="8"
+            cols="80"
             placeholder="Type your answer here..."
             value={answer}
             onChange={(e) =>
@@ -134,7 +158,16 @@ function Interview() {
         <div style={{ marginTop: "30px" }}>
           <h3>AI Feedback</h3>
 
-          <pre>{feedback}</pre>
+          <pre
+            style={{
+              whiteSpace: "pre-wrap",
+              background: "#f4f4f4",
+              padding: "15px",
+              borderRadius: "10px",
+            }}
+          >
+            {feedback}
+          </pre>
         </div>
       )}
     </div>
