@@ -1,19 +1,72 @@
 import { useState } from "react";
-import { generateQuestions } from "../services/gemini";
+import {
+  generateQuestions,
+  evaluateAnswer,
+} from "../services/gemini";
 
 function Interview() {
-  const [questions, setQuestions] = useState("");
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleGenerate = async (topic) => {
     setLoading(true);
+    setFeedback("");
+    setAnswer("");
 
     try {
       const result = await generateQuestions(topic);
-      setQuestions(result);
+      setQuestion(result);
     } catch (error) {
       console.error(error);
-      setQuestions("Failed to generate questions.");
+      setQuestion("Failed to generate question.");
+    }
+
+    setLoading(false);
+  };
+
+  const handleEvaluate = async () => {
+    if (!answer.trim()) {
+      alert("Please enter an answer");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await evaluateAnswer(
+        question,
+        answer
+      );
+
+      setFeedback(result);
+
+      const scoreMatch =
+        result.match(/Score:\s*(\d+)\/10/i);
+
+      const score = scoreMatch
+        ? scoreMatch[1]
+        : "0";
+
+      const history =
+        JSON.parse(
+          localStorage.getItem("interviews")
+        ) || [];
+
+      history.push({
+        role: question,
+        score: Number(score),
+        date: new Date().toLocaleDateString(),
+      });
+
+      localStorage.setItem(
+        "interviews",
+        JSON.stringify(history)
+      );
+    } catch (error) {
+      console.error(error);
+      setFeedback("Failed to evaluate answer.");
     }
 
     setLoading(false);
@@ -21,7 +74,7 @@ function Interview() {
 
   return (
     <div style={{ padding: "40px" }}>
-      <h1>Mock Interview</h1>
+      <h1>AI Interview Coach</h1>
 
       <h3>Select Interview Type</h3>
 
@@ -50,13 +103,40 @@ function Interview() {
         HR
       </button>
 
-      <div style={{ marginTop: "30px" }}>
-        {loading ? (
-          <p>Generating questions...</p>
-        ) : (
-          <pre>{questions}</pre>
-        )}
-      </div>
+      {loading && <p>Loading...</p>}
+
+      {question && (
+        <div style={{ marginTop: "30px" }}>
+          <h3>Question</h3>
+
+          <p>{question}</p>
+
+          <textarea
+            rows="6"
+            cols="70"
+            placeholder="Type your answer here..."
+            value={answer}
+            onChange={(e) =>
+              setAnswer(e.target.value)
+            }
+          />
+
+          <br />
+          <br />
+
+          <button onClick={handleEvaluate}>
+            Evaluate Answer
+          </button>
+        </div>
+      )}
+
+      {feedback && (
+        <div style={{ marginTop: "30px" }}>
+          <h3>AI Feedback</h3>
+
+          <pre>{feedback}</pre>
+        </div>
+      )}
     </div>
   );
 }
