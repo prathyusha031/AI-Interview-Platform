@@ -1,4 +1,13 @@
 import { useEffect, useState } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ResponsiveContainer,
+} from "recharts";
 
 function Dashboard() {
   const [history, setHistory] = useState([]);
@@ -24,97 +33,144 @@ function Dashboard() {
 
   const bestScore =
     totalInterviews > 0
-      ? Math.max(
-          ...history.map((item) => item.score)
-        )
+      ? Math.max(...history.map((item) => item.score))
       : 0;
 
+  const chartData = history.map((item, index) => ({
+    attempt: `#${index + 1}`,
+    score: item.score,
+  }));
+
   return (
-    <div style={{ padding: "40px" }}>
-      <h1>Performance Dashboard</h1>
+    <div
+      style={{
+        padding: "40px",
+        background: "#0f172a",
+        minHeight: "100vh",
+        color: "white",
+      }}
+    >
+      <h1>📊 Performance Dashboard</h1>
 
       <div
         style={{
           display: "flex",
           gap: "20px",
-          marginTop: "20px",
+          marginTop: "30px",
           flexWrap: "wrap",
         }}
       >
         <div
           style={{
-            border: "1px solid #ddd",
+            background: "#1e293b",
             padding: "20px",
-            borderRadius: "10px",
-            minWidth: "200px",
+            borderRadius: "12px",
+            minWidth: "220px",
           }}
         >
           <h3>Total Interviews</h3>
-          <p>{totalInterviews}</p>
+          <h2>{totalInterviews}</h2>
         </div>
 
         <div
           style={{
-            border: "1px solid #ddd",
+            background: "#1e293b",
             padding: "20px",
-            borderRadius: "10px",
-            minWidth: "200px",
+            borderRadius: "12px",
+            minWidth: "220px",
           }}
         >
           <h3>Average Score</h3>
-          <p>{averageScore}/10</p>
+          <h2>{averageScore}/10</h2>
         </div>
 
         <div
           style={{
-            border: "1px solid #ddd",
+            background: "#1e293b",
             padding: "20px",
-            borderRadius: "10px",
-            minWidth: "200px",
+            borderRadius: "12px",
+            minWidth: "220px",
           }}
         >
           <h3>Best Score</h3>
-          <p>{bestScore}/10</p>
+          <h2>{bestScore}/10</h2>
         </div>
       </div>
 
-      <h2 style={{ marginTop: "40px" }}>
-        Interview History
-      </h2>
+      <div
+        style={{
+          background: "#1e293b",
+          marginTop: "40px",
+          padding: "20px",
+          borderRadius: "12px",
+        }}
+      >
+        <h2>📈 Score Progress</h2>
 
-      {history.length > 0 ? (
-        history.map((item, index) => (
-          <div
-            key={index}
-            style={{
-              border: "1px solid #ddd",
-              padding: "15px",
-              borderRadius: "10px",
-              marginBottom: "15px",
-              marginTop: "15px",
-            }}
-          >
-            <p>
-              <strong>Role:</strong> {item.role}
-            </p>
+        {chartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={350}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="attempt" />
+              <YAxis domain={[0, 10]} />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="score"
+                stroke="#38bdf8"
+                strokeWidth={3}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <p>No interview data available.</p>
+        )}
+      </div>
 
-            <p>
-              <strong>Date:</strong> {item.date}
-            </p>
+      <div
+        style={{
+          marginTop: "40px",
+          background: "#1e293b",
+          padding: "20px",
+          borderRadius: "12px",
+        }}
+      >
+        <h2>Interview History</h2>
 
-            <p>
-              <strong>Score:</strong> {item.score}/10
-            </p>
+        {history.length === 0 ? (
+          <p>No interviews yet.</p>
+        ) : (
+          history.map((item, index) => (
+            <div
+              key={index}
+              style={{
+                marginBottom: "20px",
+                padding: "15px",
+                borderBottom:
+                  "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              <p>
+                <strong>Role:</strong> {item.role}
+              </p>
 
-            <p>
-              <strong>Question:</strong>{" "}
-              {item.question}
-            </p>
-          </div>
-        ))
-      ) : (
-        <p>No interviews yet.</p>
-      )}
+              <p>
+                <strong>Date:</strong> {item.date}
+              </p>
+
+              <p>
+                <strong>Score:</strong>{" "}
+                {item.score}/10
+              </p>
+
+              <p>
+                <strong>Question:</strong>{" "}
+                {item.question}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
