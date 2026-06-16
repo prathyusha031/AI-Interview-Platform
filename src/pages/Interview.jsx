@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { jsPDF } from "jspdf";
 import {
   generateQuestions,
   evaluateAnswer,
@@ -16,6 +17,10 @@ function Interview() {
 
   const [selectedRole, setSelectedRole] =
     useState("");
+  
+  const [scores, setScores] = useState([]);
+
+  const [reportData, setReportData] = useState([]);
 
   const [timeLeft, setTimeLeft] = useState(120);
   const [timerRunning, setTimerRunning] =
@@ -34,26 +39,24 @@ function Interview() {
   }, [timerRunning, timeLeft]);
 
     useEffect(() => {
-        if (timeLeft === 0) {
-          setTimerRunning(false);
+      if (timeLeft === 0) {
+        setTimerRunning(false);
 
-        if (answer.trim()) {
-          handleEvaluate();
-        } else {
-          setFeedback(
-            "⏰ Time is up! No answer was submitted."
-         );
-        }
-     }
-  }, [timeLeft, answer]);
+       if (answer.trim()) {
+         handleEvaluate();
+       } else {
+         setFeedback(
+          "⏰ Time is up! No answer was submitted."
+        );
+      }
+    }
+  }, [timeLeft]);
 
   const [difficulty, setDifficulty] =
     useState("Easy");
 
   const [interviewCompleted, setInterviewCompleted] =
     useState(false);
-
-  const [scores, setScores] = useState([]);
 
   const handleGenerate = async (topic) => {
     setLoading(true);
@@ -66,6 +69,7 @@ function Interview() {
     setTimerRunning(true);
     setInterviewCompleted(false);
     setScores([]);
+    setReportData([]);
 
     try {
       const result = await generateQuestions(
@@ -122,6 +126,16 @@ function Interview() {
         : 0;
 
       setScores((prev) => [...prev, score]);
+
+      setReportData((prev) => [
+        ...prev,
+        {
+           question: currentQuestion,
+           answer,
+           score,
+           feedback: result,
+        },
+      ]);
 
       const history =
         JSON.parse(
@@ -183,11 +197,195 @@ function Interview() {
 
   let badge = "Beginner";
 
-      if (Number(averageScore) >= 8) {
+      if (Number(averageScore) >= 9) {
         badge = "Advanced";
-      } else if (Number(averageScore) >= 5) {
+      } else if (Number(averageScore) >= 7) {
         badge = "Intermediate";
       }
+  
+    const downloadReport = () => {
+      const doc = new jsPDF();
+
+        doc.setFillColor(15, 23, 42);
+        doc.rect(0, 0, 210, 30, "F");
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(22);
+        doc.text("AI Interview Assessment Report", 20, 20);
+
+        doc.setTextColor(0, 0, 0);
+
+        doc.setFontSize(12);
+
+        doc.text(`Role: ${selectedRole}`, 20, 45);
+        doc.text(`Difficulty: ${difficulty}`, 20, 55);
+        doc.text(`Questions Attempted: ${questions.length}`, 20, 65);
+        doc.text(`Average Score: ${averageScore}/10`, 20, 75);
+        doc.text(`Skill Badge: ${badge}`, 20, 85);
+        doc.text(
+          `Generated On: ${new Date().toLocaleDateString()}`,
+           20,
+           95
+        );
+
+        let y = 120;
+
+        doc.setFontSize(14);
+        doc.text("Questions", 20, y);
+
+        doc.setFontSize(11);
+
+        reportData.forEach((item, index) => {
+
+          if (y > 220) {
+           doc.addPage();
+           y = 20;
+          }
+
+          doc.setFontSize(13);
+          doc.text(`Question ${index + 1}`, 20, y);
+
+          y += 8;
+
+        const questionText = doc.splitTextToSize(
+            item.question,
+            170
+        );
+
+        doc.text(questionText, 20, y);
+
+        y += questionText.length * 6 + 5;
+
+        doc.setFontSize(11);
+
+        const answerText = doc.splitTextToSize(
+           item.answer,
+           170
+        );
+
+        const feedbackText = doc.splitTextToSize(
+           item.feedback,
+           170
+        );
+
+        const estimatedHeight =
+           questionText.length * 6 +
+           answerText.length * 6 +
+           feedbackText.length * 6 +
+           50;
+
+        if (y + estimatedHeight > 270) {
+           doc.addPage();
+           y = 20;
+        }
+
+        doc.text("Candidate Answer:", 20, y);
+
+       y += 6;
+
+       doc.text(answerText, 25, y);
+
+       y += answerText.length * 6 + 5;
+
+        doc.text(
+         `Score: ${item.score}/10`,
+          20,
+          y
+        );
+
+        y += 8;
+
+        doc.text(
+          "AI Feedback:",
+           20,
+           y
+        );
+
+        y += 6;
+
+        doc.text(
+          feedbackText,
+          25,
+          y
+        );
+
+        y += feedbackText.length * 6 + 15;
+      
+        doc.text(
+         "AI Feedback:",
+          20,
+          y
+        );
+
+        y += 6;
+
+        doc.text(
+          feedbackText,
+          25,
+          y
+        );
+
+        y += feedbackText.length * 6 + 15;
+      });
+        
+        doc.addPage();
+
+        doc.setFontSize(18);
+        doc.text("Performance Summary", 20, 20);
+
+        doc.setFontSize(12);
+
+        doc.text(
+          `Average Score: ${averageScore}/10`,
+           20,
+           40
+        );
+
+        doc.text(
+          `Skill Level: ${badge}`,
+           20,
+           50
+        );
+
+        if (Number(averageScore) >= 8) {
+          doc.text(
+            "Excellent performance. Ready for interviews.",
+             20,
+             70
+        );
+      } else if (Number(averageScore) >= 5) {
+        doc.text(
+          "Good understanding. More practice recommended.",
+           20,
+           70
+        );
+      } else {
+        doc.text(
+          "Needs improvement. Continue practicing.",
+           20,
+           70
+       );
+      }
+
+      const pageCount = doc.internal.getNumberOfPages();
+
+      for (let i = 1; i <= pageCount; i++) {
+
+        doc.setPage(i);
+
+        doc.setFontSize(10);
+
+        doc.text(
+          `Page ${i} of ${pageCount}`,
+           170,
+           290
+        );
+      }
+
+        doc.save(
+         `${selectedRole}-Interview-Report.pdf`
+        );
+      };
 
   return (
     <div
@@ -464,7 +662,7 @@ function Interview() {
         </div>
       )}
 
-            {interviewCompleted && (
+      {interviewCompleted && (
         <div
           style={{
             marginTop: "40px",
@@ -491,10 +689,28 @@ function Interview() {
             Great job! Generate a new interview
             to continue practicing.
           </p>
+        
+        <button
+           onClick={downloadReport}
+           style={{
+             marginTop: "20px",
+             padding: "12px 25px",
+             background: "#0f172a",
+             color: "white",
+             border: "none",
+             borderRadius: "8px",
+             cursor: "pointer",
+             fontWeight: "bold",
+            }}
+          >
+            📄 Download Report
+          </button>
+
         </div>
       )}
     </div>
   );
 }
+
 
 export default Interview;
