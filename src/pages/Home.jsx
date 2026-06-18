@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 
-const isLoggedIn =
+function Home() {
+
+  const isLoggedIn =
   localStorage.getItem("isLoggedIn");
 
 const currentUser =
@@ -9,8 +11,6 @@ const currentUser =
       "currentUser"
     )
   );
-
-function Home() {
   return (
     <div
       style={{
@@ -61,48 +61,73 @@ function Home() {
             Home
           </Link>
 
-          <Link
-            to="/dashboard"
-            style={{
-              textDecoration: "none",
-              color: "white",
-              fontWeight: "bold",
-            }}
-          >
-            Dashboard
-          </Link>
+          {isLoggedIn ? (
+  <>
+    <Link
+      to="/dashboard"
+      style={{
+        textDecoration: "none",
+        color: "white",
+        fontWeight: "bold",
+      }}
+    >
+      Dashboard
+    </Link>
 
-          <Link to="/login">
-  <button
-    style={{
-      background: "transparent",
-      border: "1px solid #60a5fa",
-      color: "#60a5fa",
-      padding: "10px 20px",
-      borderRadius: "8px",
-      cursor: "pointer",
-      fontWeight: "bold",
-    }}
-  >
-    Login
-  </button>
-</Link>
+    <button
+      onClick={() => {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("currentUser");
+        window.location.reload();
+      }}
+      style={{
+        background: "#ef4444",
+        border: "none",
+        color: "white",
+        padding: "10px 20px",
+        borderRadius: "8px",
+        cursor: "pointer",
+        fontWeight: "bold",
+      }}
+    >
+      Logout
+    </button>
+  </>
+) : (
+  <>
+    <Link to="/login">
+      <button
+        style={{
+          background: "transparent",
+          border: "1px solid #60a5fa",
+          color: "#60a5fa",
+          padding: "10px 20px",
+          borderRadius: "8px",
+          cursor: "pointer",
+          fontWeight: "bold",
+        }}
+      >
+        Login
+      </button>
+    </Link>
 
-<Link to="/register">
-  <button
-    style={{
-      background: "#2563eb",
-      border: "none",
-      color: "white",
-      padding: "10px 20px",
-      borderRadius: "8px",
-      cursor: "pointer",
-      fontWeight: "bold",
-    }}
-  >
-    Register
-  </button>
-</Link>
+    <Link to="/register">
+      <button
+        style={{
+          background: "#2563eb",
+          border: "none",
+          color: "white",
+          padding: "10px 20px",
+          borderRadius: "8px",
+          cursor: "pointer",
+          fontWeight: "bold",
+        }}
+      >
+        Register
+      </button>
+    </Link>
+  </>
+)}
         </div>
       </nav>
 
@@ -278,7 +303,7 @@ function Home() {
             paddingBottom: "80px",
           }}
         >
-          
+
           <div
             style={{
               background:

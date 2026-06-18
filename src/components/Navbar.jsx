@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 
 function Navbar() {
+   const isLoggedIn =
+    localStorage.getItem("isLoggedIn");
   return (
     <nav
       style={{
