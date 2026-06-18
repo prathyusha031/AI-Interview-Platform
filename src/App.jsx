@@ -9,17 +9,50 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Base from "./pages/Base";
 import Logout from "./pages/Logout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Base />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/interview" element={<Interview />} />
+        <Route
+              path="/home"
+              element={
+              <ProtectedRoute>
+              <Home />
+              </ProtectedRoute>
+            }
+        />
+
+        <Route
+              path="/dashboard"
+              element={
+              <ProtectedRoute>
+              <Dashboard />
+              </ProtectedRoute>
+            }
+        />
+
+        <Route
+              path="/interview"
+              element={
+              <ProtectedRoute>
+              <Interview />
+              </ProtectedRoute>
+            }
+        />
+
+        <Route
+              path="/resume-interview"
+              element={
+             <ProtectedRoute>
+             <ResumeInterview />
+             </ProtectedRoute>
+            }
+        />
+        
         <Route path="/feedback" element={<Feedback />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/resume-interview" element={<ResumeInterview />} />
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
