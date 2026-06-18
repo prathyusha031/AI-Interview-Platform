@@ -7,12 +7,15 @@ import Dashboard from "./pages/Dashboard";
 import ResumeInterview from "./pages/ResumeInterview";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Base from "./pages/Base";
+import Logout from "./pages/Logout";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Base />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/interview" element={<Interview />} />
         <Route path="/feedback" element={<Feedback />} />
         <Route path="/dashboard" element={<Dashboard />} />
@@ -20,6 +23,7 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/logout" element={<Logout />} />
       </Routes>
     </BrowserRouter>
   );

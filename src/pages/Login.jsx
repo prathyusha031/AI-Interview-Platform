@@ -44,7 +44,7 @@ function Login() {
 
     alert("Login successful");
 
-    navigate("/");
+    navigate("/home");
   };
 
   return (

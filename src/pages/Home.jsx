@@ -74,24 +74,21 @@ const currentUser =
       Dashboard
     </Link>
 
-    <button
-      onClick={() => {
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("currentUser");
-        window.location.reload();
-      }}
-      style={{
-        background: "#ef4444",
-        border: "none",
-        color: "white",
-        padding: "10px 20px",
-        borderRadius: "8px",
-        cursor: "pointer",
-        fontWeight: "bold",
-      }}
-    >
-      Logout
-    </button>
+    <Link to="/logout">
+  <button
+    style={{
+      background: "#ef4444",
+      border: "none",
+      color: "white",
+      padding: "10px 20px",
+      borderRadius: "8px",
+      cursor: "pointer",
+      fontWeight: "bold",
+    }}
+  >
+    Logout
+  </button>
+</Link>
   </>
 ) : (
   <>
