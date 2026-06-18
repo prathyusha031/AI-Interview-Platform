@@ -1,4 +1,5 @@
 import { useState } from "react";
+import jsPDF from "jspdf";
 import { parseResume } from "../utils/resumeParser";
 import {
   generateResumeQuestions,
@@ -49,7 +50,6 @@ const handleFileChange = async (e) => {
     setCurrentAnswer("");
     setInterviewStarted(false);
     setFeedback("");
-    setError("");
   } catch (error) {
     console.error(error);
 
@@ -598,23 +598,29 @@ const stopListening = () => {
     >
       <button
         onClick={() => {
-          const blob = new Blob(
-            [feedback],
-            {
-              type: "text/plain",
-            }
+          const doc = new jsPDF();
+
+            doc.setFontSize(16);
+
+            doc.text(
+              "Interview Evaluation Report",
+               10,
+               10
+            );
+
+        const lines =
+          doc.splitTextToSize(
+            feedback,
+            180
           );
 
-          const link =
-            document.createElement("a");
+         doc.setFontSize(11);
 
-          link.href =
-            URL.createObjectURL(blob);
+         doc.text(lines, 10, 20);
 
-          link.download =
-            "Interview_Report.txt";
-
-          link.click();
+         doc.save(
+             "Interview_Report.pdf"
+         );
         }}
         style={{
           padding: "12px 20px",
