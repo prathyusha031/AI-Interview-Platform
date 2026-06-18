@@ -1,5 +1,6 @@
 import { useState } from "react";
 import jsPDF from "jspdf";
+import Navbar from "../components/Navbar";
 import { parseResume } from "../utils/resumeParser";
 import {
   generateResumeQuestions,
@@ -244,7 +245,10 @@ const stopListening = () => {
 };
 
   return (
-  <div
+  <>
+    <Navbar />
+
+    <div
     style={{
       minHeight: "100vh",
       background: "#0f172a",
@@ -698,6 +702,7 @@ const stopListening = () => {
   </div>
 )}
   </div>
+</>
 );
 }
 

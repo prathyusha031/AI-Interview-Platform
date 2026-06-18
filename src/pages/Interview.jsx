@@ -87,12 +87,14 @@ function Interview() {
 
       setQuestions(parsedQuestions);
     } catch (error) {
-      console.error(error);
+  console.error(error);
 
-      setQuestions([
-        "Failed to generate questions.",
-      ]);
-    }
+  alert(
+    "Failed to generate interview questions."
+  );
+
+  setQuestions([]);
+}
 
     setLoading(false);
   };
@@ -137,23 +139,6 @@ function Interview() {
         },
       ]);
 
-      const history =
-        JSON.parse(
-          localStorage.getItem("interviews")
-        ) || [];
-
-      history.push({
-        role: selectedRole,
-        difficulty,
-        question: currentQuestion,
-        score,
-        date: new Date().toLocaleDateString(),
-      });
-
-      localStorage.setItem(
-        "interviews",
-        JSON.stringify(history)
-      );
     } catch (error) {
       console.error(error);
 
@@ -166,26 +151,68 @@ function Interview() {
   };
 
   const handleNextQuestion = () => {
-    if (
-      currentIndex ===
-      questions.length - 1
-    ) {
-      setTimerRunning(false);
-      setInterviewCompleted(true);
-      return;
-    }
+  if (
+    currentIndex ===
+    questions.length - 1
+  ) {
+    const allScores = [
+  ...scores,
+];
 
-    setTimeLeft(120);
-    setTimerRunning(true);
-    setCurrentIndex((prev) => prev + 1);
-    setAnswer("");
-    setFeedback("");
-  };
+const finalScore =
+  allScores.length > 0
+        ? Number(
+            (
+              allScores.reduce(
+                (a, b) => a + b,
+                0
+              ) / scores.length
+            ).toFixed(1)
+          )
+        : 0;
 
-  const currentQuestion =
-    questions[currentIndex];
+    const history =
+      JSON.parse(
+        localStorage.getItem(
+          "interviews"
+        )
+      ) || [];
 
-  const averageScore =
+    history.push({
+      date: new Date().toLocaleString(),
+      role: selectedRole,
+      difficulty,
+      score: finalScore,
+      questionsCount:
+        questions.length,
+
+      report: reportData,
+    });
+
+    localStorage.setItem(
+      "interviews",
+      JSON.stringify(history)
+    );
+
+    setTimerRunning(false);
+    setInterviewCompleted(true);
+
+    return;
+  }
+
+  setTimeLeft(120);
+  setTimerRunning(true);
+  setCurrentIndex(
+    (prev) => prev + 1
+  );
+  setAnswer("");
+  setFeedback("");
+};
+
+const currentQuestion =
+  questions[currentIndex];
+
+const averageScore =
   scores.length > 0
     ? (
         scores.reduce(
@@ -195,13 +222,15 @@ function Interview() {
       ).toFixed(1)
     : 0;
 
-  let badge = "Beginner";
+let badge = "Beginner";
 
-      if (Number(averageScore) >= 9) {
-        badge = "Advanced";
-      } else if (Number(averageScore) >= 7) {
-        badge = "Intermediate";
-      }
+if (Number(averageScore) >= 9) {
+  badge = "Advanced";
+} else if (
+  Number(averageScore) >= 7
+) {
+  badge = "Intermediate";
+}
   
     const downloadReport = () => {
       const doc = new jsPDF();
@@ -310,42 +339,40 @@ function Interview() {
         );
 
         y += feedbackText.length * 6 + 15;
-      
-        doc.text(
-         "AI Feedback:",
-          20,
-          y
-        );
-
-        y += 6;
-
-        doc.text(
-          feedbackText,
-          25,
-          y
-        );
-
-        y += feedbackText.length * 6 + 15;
       });
         
-        doc.addPage();
+       if (y > 240) {
+  doc.addPage();
+} else {
+  y += 20;
+}
 
-        doc.setFontSize(18);
-        doc.text("Performance Summary", 20, 20);
+doc.setFontSize(18);
+doc.text(
+  "Performance Summary",
+  20,
+  y
+);
+
+y += 20;
 
         doc.setFontSize(12);
 
         doc.text(
-          `Average Score: ${averageScore}/10`,
-           20,
-           40
-        );
+  `Average Score: ${averageScore}/10`,
+  20,
+  y
+);
+
+y += 10;
 
         doc.text(
-          `Skill Level: ${badge}`,
-           20,
-           50
-        );
+  `Skill Level: ${badge}`,
+  20,
+  y
+);
+
+y += 20;
 
         if (Number(averageScore) >= 8) {
           doc.text(

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Navbar from "../components/Navbar";
 import {
   LineChart,
   Line,
@@ -74,7 +75,10 @@ function Dashboard() {
   };
 
   return (
-    <div
+<>
+  <Navbar />
+
+  <div
       style={{
         padding: "40px",
         background: "#0f172a",
@@ -340,43 +344,115 @@ function Dashboard() {
                 </h3>
 
                 <details
-                  style={{
-                    marginTop:
-                      "10px",
-                  }}
-                >
-                  <summary
-                    style={{
-                      cursor:
-                        "pointer",
-                    }}
-                  >
-                    View Full
-                    Report
-                  </summary>
+  style={{
+    marginTop: "10px",
+  }}
+>
+  <summary
+    style={{
+      cursor: "pointer",
+    }}
+  >
+    View Full Report
+  </summary>
 
-                  <pre
-                    style={{
-                      whiteSpace:
-                        "pre-wrap",
-                      marginTop:
-                        "10px",
-                      lineHeight:
-                        "1.7",
-                    }}
-                  >
-                    {
-                      item.report
-                    }
-                  </pre>
-                </details>
+  <div
+    style={{
+      marginTop: "15px",
+    }}
+  >
+    {Array.isArray(item.report) ? (
+      item.report.map(
+        (q, reportIndex) => (
+          <div
+            key={reportIndex}
+            style={{
+              background:
+                "#1e293b",
+              padding: "15px",
+              borderRadius:
+                "10px",
+              marginBottom:
+                "15px",
+            }}
+          >
+            <h4>
+              Question{" "}
+              {reportIndex + 1}
+            </h4>
+
+            <p>
+              <strong>
+                Question:
+              </strong>
+            </p>
+
+            <p>
+              {q.question}
+            </p>
+
+            <p>
+              <strong>
+                Answer:
+              </strong>
+            </p>
+
+            <p>
+              {q.answer}
+            </p>
+
+            <p>
+              <strong>
+                Score:
+              </strong>{" "}
+              {q.score}/10
+            </p>
+
+            <p>
+              <strong>
+                Feedback:
+              </strong>
+            </p>
+
+            <pre
+              style={{
+                whiteSpace:
+                  "pre-wrap",
+                lineHeight:
+                  "1.6",
+                color:
+                  "#e2e8f0",
+              }}
+            >
+              {q.feedback}
+            </pre>
+          </div>
+        )
+      )
+    ) : (
+      <pre
+        style={{
+          whiteSpace:
+            "pre-wrap",
+          marginTop:
+            "10px",
+          lineHeight:
+            "1.7",
+        }}
+      >
+        {item.report}
+      </pre>
+    )}
+  </div>
+</details>
               </div>
             )
           )
         )}
       </div>
     </div>
-  );
+</>
+);
 }
 
 export default Dashboard;
