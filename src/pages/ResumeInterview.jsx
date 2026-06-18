@@ -24,6 +24,9 @@ const [feedback, setFeedback] = useState("");
 
 const [error, setError] = useState("");
 
+const [isListening, setIsListening] =
+  useState(false);
+
 const handleFileChange = async (e) => {
   const file = e.target.files[0];
 
@@ -112,6 +115,48 @@ const handleSubmitInterview = async () => {
   } finally {
     setLoading(false);
   }
+};
+
+const startListening = () => {
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    alert(
+      "Speech Recognition is not supported in this browser."
+    );
+    return;
+  }
+
+  const recognition =
+    new SpeechRecognition();
+
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = "en-US";
+
+  recognition.start();
+
+  setIsListening(true);
+
+  recognition.onresult = (event) => {
+    const transcript =
+      event.results[0][0].transcript;
+
+    setCurrentAnswer(
+      (prev) =>
+        prev + " " + transcript
+    );
+  };
+
+  recognition.onend = () => {
+    setIsListening(false);
+  };
+
+  recognition.onerror = () => {
+    setIsListening(false);
+  };
 };
 
   return (
@@ -271,173 +316,186 @@ const handleSubmitInterview = async () => {
       )}
 
     {/* Interview */}
-    {interviewStarted &&
-      currentQuestion < questions.length && (
+{interviewStarted &&
+  currentQuestion < questions.length && (
+    <div
+      style={{
+        marginTop: "20px",
+        background: "#334155",
+        padding: "25px",
+        borderRadius: "12px",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "15px",
+        }}
+      >
+        <h3>
+          Question {currentQuestion + 1}/
+          {questions.length}
+        </h3>
+
+        <span>
+          {Math.round(
+            ((currentQuestion + 1) /
+              questions.length) *
+              100
+          )}
+          % Complete
+        </span>
+      </div>
+
+      {/* Progress Bar */}
+      <div
+        style={{
+          height: "8px",
+          background: "#1e293b",
+          borderRadius: "20px",
+          marginBottom: "20px",
+        }}
+      >
         <div
           style={{
-            marginTop: "20px",
-            background: "#334155",
-            padding: "25px",
-            borderRadius: "12px",
+            width: `${
+              ((currentQuestion + 1) /
+                questions.length) *
+              100
+            }%`,
+            height: "100%",
+            background: "#22c55e",
+            borderRadius: "20px",
           }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent:
-                "space-between",
-              marginBottom: "15px",
-            }}
-          >
-            <h3>
-              Question {currentQuestion + 1}
-              /{questions.length}
-            </h3>
+        />
+      </div>
 
-            <span>
-              {Math.round(
-                ((currentQuestion + 1) /
-                  questions.length) *
-                  100
-              )}
-              % Complete
-            </span>
-          </div>
+      <p
+        style={{
+          fontSize: "18px",
+          lineHeight: "1.7",
+        }}
+      >
+        {questions[currentQuestion]}
+      </p>
 
-          {/* Progress Bar */}
-          <div
-            style={{
-              height: "8px",
-              background: "#1e293b",
-              borderRadius: "20px",
-              marginBottom: "20px",
-            }}
-          >
-            <div
-              style={{
-                width: `${
-                  ((currentQuestion + 1) /
-                    questions.length) *
-                  100
-                }%`,
-                height: "100%",
-                background: "#22c55e",
-                borderRadius: "20px",
-              }}
-            />
-          </div>
+      <textarea
+        rows="6"
+        value={currentAnswer}
+        onChange={(e) =>
+          setCurrentAnswer(e.target.value)
+        }
+        placeholder="Enter your answer..."
+        style={{
+          width: "100%",
+          padding: "12px",
+          borderRadius: "8px",
+          marginTop: "15px",
+        }}
+      />
 
-          <p
-            style={{
-              fontSize: "18px",
-              lineHeight: "1.7",
-            }}
-          >
-            {questions[currentQuestion]}
-          </p>
+      {/* Character Count */}
+      <div
+        style={{
+          textAlign: "right",
+          marginTop: "5px",
+          color: "#94a3b8",
+        }}
+      >
+        {currentAnswer.length} characters
+      </div>
 
-          <textarea
-            rows="6"
-            value={currentAnswer}
-            onChange={(e) =>
-              setCurrentAnswer(
-                e.target.value
-              )
-            }
-            placeholder="Enter your answer..."
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              marginTop: "15px",
-            }}
-          />
+      {/* Voice Answer Button */}
+      <button
+        onClick={startListening}
+        style={{
+          marginTop: "10px",
+          padding: "10px 18px",
+          background: "#7c3aed",
+          color: "white",
+          border: "none",
+          borderRadius: "8px",
+          cursor: "pointer",
+          marginRight: "10px",
+        }}
+      >
+        {isListening
+          ? "Listening..."
+          : "🎤 Speak Answer"}
+      </button>
 
-          <div
-            style={{
-              textAlign: "right",
-              marginTop: "5px",
-              color: "#94a3b8",
-            }}
-          >
-            {currentAnswer.length}
-            characters
-          </div>
+      {/* Next Button */}
+      <button
+        onClick={() => {
+          if (!currentAnswer.trim()) {
+            alert(
+              "Please answer this question before proceeding."
+            );
+            return;
+          }
 
-          <button
-            onClick={() => {
-              if (
-                !currentAnswer.trim()
-              ) {
-                alert(
-                  "Please answer this question before proceeding."
-                );
-                return;
-              }
+          setAnswers([
+            ...answers,
+            currentAnswer,
+          ]);
 
-              setAnswers([
-                ...answers,
-                currentAnswer,
-              ]);
+          setCurrentAnswer("");
 
-              setCurrentAnswer("");
+          setCurrentQuestion(
+            currentQuestion + 1
+          );
+        }}
+        style={{
+          marginTop: "15px",
+          padding: "12px 24px",
+          background: "#2563eb",
+          color: "white",
+          border: "none",
+          borderRadius: "8px",
+          cursor: "pointer",
+        }}
+      >
+        {currentQuestion ===
+        questions.length - 1
+          ? "Finish Interview"
+          : "Next Question"}
+      </button>
+    </div>
+  )}
 
-              setCurrentQuestion(
-                currentQuestion + 1
-              );
-            }}
-            style={{
-              marginTop: "15px",
-              padding: "12px 24px",
-              background: "#2563eb",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-            }}
-          >
-            {currentQuestion ===
-            questions.length - 1
-              ? "Finish Interview"
-              : "Next Question"}
-          </button>
-        </div>
-      )}
+{/* Submit */}
+{interviewStarted &&
+  currentQuestion >=
+    questions.length &&
+  !feedback && (
+    <div
+      style={{
+        textAlign: "center",
+        marginTop: "30px",
+      }}
+    >
+      <button
+        onClick={handleSubmitInterview}
+        disabled={loading}
+        style={{
+          padding: "14px 30px",
+          background: "#f97316",
+          color: "white",
+          border: "none",
+          borderRadius: "8px",
+          cursor: "pointer",
+          fontSize: "16px",
+        }}
+      >
+        {loading
+          ? "Evaluating..."
+          : "Generate Interview Report"}
+      </button>
+    </div>
+  )}
 
-    {/* Submit */}
-    {interviewStarted &&
-      currentQuestion >=
-        questions.length &&
-      !feedback && (
-        <div
-          style={{
-            textAlign: "center",
-            marginTop: "30px",
-          }}
-        >
-          <button
-            onClick={
-              handleSubmitInterview
-            }
-            disabled={loading}
-            style={{
-              padding: "14px 30px",
-              background: "#f97316",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontSize: "16px",
-            }}
-          >
-            {loading
-              ? "Evaluating..."
-              : "Generate Interview Report"}
-          </button>
-        </div>
-      )}
-
-    {/* Feedback */}
+{/* Feedback */}
 {feedback && (
   <div
     style={{
