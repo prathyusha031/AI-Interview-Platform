@@ -1,5 +1,15 @@
 import { Link } from "react-router-dom";
 
+const isLoggedIn =
+  localStorage.getItem("isLoggedIn");
+
+const currentUser =
+  JSON.parse(
+    localStorage.getItem(
+      "currentUser"
+    )
+  );
+
 function Home() {
   return (
     <div
@@ -107,6 +117,21 @@ function Home() {
           paddingRight: "20px",
         }}
       >
+
+      {isLoggedIn &&
+  currentUser && (
+    <h3
+      style={{
+        color: "#60a5fa",
+        marginBottom: "20px",
+      }}
+    >
+      Welcome Back,
+      {" "}
+      {currentUser.name}
+      👋
+    </h3>
+)}
         <h1
           style={{
             fontSize: "64px",
@@ -144,7 +169,13 @@ function Home() {
             flexWrap: "wrap",
           }}
         >
-          <Link to="/interview">
+          <Link
+  to={
+    isLoggedIn
+      ? "/interview"
+      : "/login"
+  }
+>
             <button
               style={{
                 background: "#2563eb",
@@ -163,7 +194,13 @@ function Home() {
             </button>
           </Link>
 
-          <Link to="/resume-interview">
+          <Link
+  to={
+    isLoggedIn
+      ? "/resume-interview"
+      : "/login"
+  }
+>
             <button
               style={{
                 background: "#16a34a",

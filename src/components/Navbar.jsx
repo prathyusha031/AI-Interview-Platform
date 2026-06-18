@@ -22,49 +22,98 @@ function Navbar() {
       </h2>
 
       <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "20px",
+  }}
+>
+  <Link
+    to="/"
+    style={{
+      textDecoration: "none",
+      color: "white",
+      fontWeight: "bold",
+    }}
+  >
+    Home
+  </Link>
+
+  {isLoggedIn ? (
+    <>
+      <Link
+        to="/dashboard"
         style={{
-          display: "flex",
-          gap: "20px",
-          alignItems: "center",
+          textDecoration: "none",
+          color: "white",
+          fontWeight: "bold",
         }}
       >
-        <Link
-          to="/"
-          style={{
-            color: "white",
-            textDecoration: "none",
-            fontSize: "16px",
-          }}
-        >
-          Home
-        </Link>
+        Dashboard
+      </Link>
 
-        <Link
-          to="/login"
+      <button
+        onClick={() => {
+          localStorage.removeItem(
+            "isLoggedIn"
+          );
+
+          localStorage.removeItem(
+            "currentUser"
+          );
+
+          window.location.reload();
+        }}
+        style={{
+          background: "#ef4444",
+          border: "none",
+          color: "white",
+          padding: "10px 20px",
+          borderRadius: "8px",
+          cursor: "pointer",
+          fontWeight: "bold",
+        }}
+      >
+        Logout
+      </button>
+    </>
+  ) : (
+    <>
+      <Link to="/login">
+        <button
           style={{
-            color: "white",
-            textDecoration: "none",
-            padding: "8px 16px",
-            border: "1px solid #38bdf8",
+            background: "transparent",
+            border:
+              "1px solid #60a5fa",
+            color: "#60a5fa",
+            padding: "10px 20px",
             borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: "bold",
           }}
         >
           Login
-        </Link>
+        </button>
+      </Link>
 
-        <Link
-          to="/register"
+      <Link to="/register">
+        <button
           style={{
-            background: "#38bdf8",
+            background: "#2563eb",
+            border: "none",
             color: "white",
-            textDecoration: "none",
-            padding: "8px 16px",
+            padding: "10px 20px",
             borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: "bold",
           }}
         >
           Register
-        </Link>
-      </div>
+        </button>
+      </Link>
+    </>
+  )}
+</div>
     </nav>
   );
 }
