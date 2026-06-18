@@ -502,7 +502,7 @@ const stopListening = () => {
             );
             return;
           }
-
+          
           setAnswers([
             ...answers,
             currentAnswer,
