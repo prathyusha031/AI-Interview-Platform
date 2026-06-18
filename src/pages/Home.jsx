@@ -51,7 +51,7 @@ const currentUser =
           }}
         >
           <Link
-            to="/"
+            to="/home"
             style={{
               textDecoration: "none",
               color: "white",

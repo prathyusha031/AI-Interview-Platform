@@ -73,83 +73,115 @@ function Dashboard() {
     return "#ef4444";
   };
 
+
+  const currentUser =
+  JSON.parse(
+    localStorage.getItem(
+      "currentUser"
+    )
+  ) || {};
+
   return (
   <div
+    style={{
+      padding: "40px",
+      background: "#0f172a",
+      minHeight: "100vh",
+      color: "white",
+    }}
+  >
+    <h1
       style={{
-        padding: "40px",
-        background: "#0f172a",
-        minHeight: "100vh",
-        color: "white",
+        marginBottom: "25px",
       }}
     >
-      <h1>
-        📊 Performance Dashboard
-      </h1>
+      📊 Interview Analytics Dashboard
+    </h1>
 
-      {/* Statistics */}
+    {/* User Profile */}
+
+    <div
+      style={{
+          background:
+               "linear-gradient(135deg,#1e293b,#334155)",
+           padding: "30px",
+           borderRadius: "16px",
+           marginBottom: "30px",
+           boxShadow:
+               "0 10px 25px rgba(0,0,0,0.3)",
+      }}
+    >
+      <h2
+  style={{
+    color: "#60a5fa",
+    marginBottom: "15px",
+  }}
+>
+  👤 User Profile
+</h2>
+
+<h3
+  style={{
+    marginBottom: "20px",
+  }}
+>
+  Welcome Back, {currentUser?.name} 👋
+</h3>
+
+<p>
+  <strong>📧 Email:</strong>{" "}
+  {currentUser?.email}
+</p>
+    </div>
+
+    {/* Statistics */}
+
+    <div
+      style={{
+        display: "flex",
+        gap: "20px",
+        marginTop: "30px",
+        flexWrap: "wrap",
+      }}
+    >
+      <div
+        style={{
+          background:
+             "linear-gradient(135deg,#2563eb,#1d4ed8)",
+          padding: "20px",
+          borderRadius: "12px",
+          minWidth: "220px",
+        }}
+      >
+        <h3>Total Interviews</h3>
+        <h2>{totalInterviews}</h2>
+      </div>
 
       <div
         style={{
-          display: "flex",
-          gap: "20px",
-          marginTop: "30px",
-          flexWrap: "wrap",
+          background:
+              "linear-gradient(135deg,#2563eb,#1d4ed8)",
+          borderRadius: "12px",
+          minWidth: "220px",
         }}
       >
-        <div
-          style={{
-            background:
-              "#1e293b",
-            padding: "20px",
-            borderRadius:
-              "12px",
-            minWidth: "220px",
-          }}
-        >
-          <h3>
-            Total Interviews
-          </h3>
-          <h2>
-            {
-              totalInterviews
-            }
-          </h2>
-        </div>
-
-        <div
-          style={{
-            background:
-              "#1e293b",
-            padding: "20px",
-            borderRadius:
-              "12px",
-            minWidth: "220px",
-          }}
-        >
-          <h3>
-            Average Score
-          </h3>
-          <h2>
-            {averageScore}/10
-          </h2>
-        </div>
-
-        <div
-          style={{
-            background:
-              "#1e293b",
-            padding: "20px",
-            borderRadius:
-              "12px",
-            minWidth: "220px",
-          }}
-        >
-          <h3>Best Score</h3>
-          <h2>
-            {bestScore}/10
-          </h2>
-        </div>
+        <h3>Average Score</h3>
+        <h2>{averageScore}/10</h2>
       </div>
+
+      <div
+        style={{
+         background:
+             "linear-gradient(135deg,#9333ea,#7e22ce)",
+          padding: "20px",
+          borderRadius: "12px",
+          minWidth: "220px",
+        }}
+      >
+        <h3>Best Score</h3>
+        <h2>{bestScore}/10</h2>
+      </div>
+    </div>
 
       {/* Latest Interview */}
 
@@ -165,7 +197,7 @@ function Dashboard() {
           }}
         >
           <h2>
-            🎯 Latest Interview
+            🎯 Recent Interview Performance
           </h2>
 
           <p>
@@ -216,7 +248,7 @@ function Dashboard() {
         }}
       >
         <h2>
-          📈 Score Progress
+          📈 Performance Trend
         </h2>
 
         {chartData.length >
@@ -274,15 +306,24 @@ function Dashboard() {
         }}
       >
         <h2>
-          Interview History
+          📜 Interview History
         </h2>
 
         {history.length ===
         0 ? (
-          <p>
-            No interviews
-            found.
-          </p>
+          <div
+  style={{
+    textAlign: "center",
+    padding: "40px",
+  }}
+>
+  <h3>No Interviews Yet</h3>
+
+  <p>
+    Complete your first interview
+    to unlock analytics and reports.
+  </p>
+</div>
         ) : (
           history.map(
             (
