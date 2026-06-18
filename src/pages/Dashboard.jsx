@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
 import {
   LineChart,
   Line,
@@ -75,9 +74,6 @@ function Dashboard() {
   };
 
   return (
-<>
-  <Navbar />
-
   <div
       style={{
         padding: "40px",
@@ -451,7 +447,6 @@ function Dashboard() {
         )}
       </div>
     </div>
-</>
 );
 }
 

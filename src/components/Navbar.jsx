@@ -15,6 +15,7 @@ function Navbar() {
         style={{
           color: "white",
           margin: 0,
+          fontSize: "24px",
         }}
       >
         AI Interview Platform
@@ -23,7 +24,8 @@ function Navbar() {
       <div
         style={{
           display: "flex",
-          gap: "25px",
+          gap: "20px",
+          alignItems: "center",
         }}
       >
         <Link
@@ -31,39 +33,36 @@ function Navbar() {
           style={{
             color: "white",
             textDecoration: "none",
+            fontSize: "16px",
           }}
         >
           Home
         </Link>
 
         <Link
-          to="/mock"
+          to="/login"
           style={{
             color: "white",
             textDecoration: "none",
+            padding: "8px 16px",
+            border: "1px solid #38bdf8",
+            borderRadius: "8px",
           }}
         >
-          Mock Interview
+          Login
         </Link>
 
         <Link
-          to="/resume"
+          to="/register"
           style={{
+            background: "#38bdf8",
             color: "white",
             textDecoration: "none",
+            padding: "8px 16px",
+            borderRadius: "8px",
           }}
         >
-          Resume Interview
-        </Link>
-
-        <Link
-          to="/dashboard"
-          style={{
-            color: "white",
-            textDecoration: "none",
-          }}
-        >
-          Dashboard
+          Register
         </Link>
       </div>
     </nav>
