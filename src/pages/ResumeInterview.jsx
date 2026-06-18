@@ -22,10 +22,11 @@ const [interviewStarted, setInterviewStarted] =
 
 const [feedback, setFeedback] = useState("");
 
-const [error, setError] = useState("");
-
 const [isListening, setIsListening] =
   useState(false);
+
+const [recognition, setRecognition] =
+  useState(null);
 
 const handleFileChange = async (e) => {
   const file = e.target.files[0];
@@ -118,6 +119,8 @@ const handleSubmitInterview = async () => {
 };
 
 const startListening = () => {
+  if (isListening) return;
+
   const SpeechRecognition =
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
@@ -129,34 +132,77 @@ const startListening = () => {
     return;
   }
 
-  const recognition =
+  const recognitionInstance =
     new SpeechRecognition();
 
-  recognition.continuous = false;
-  recognition.interimResults = false;
-  recognition.lang = "en-US";
+  recognitionInstance.lang = "en-US";
+  recognitionInstance.continuous = true;
+  recognitionInstance.interimResults = true;
 
-  recognition.start();
+  recognitionInstance.start();
+
+  setRecognition(
+    recognitionInstance
+  );
 
   setIsListening(true);
 
-  recognition.onresult = (event) => {
-    const transcript =
-      event.results[0][0].transcript;
+  recognitionInstance.onstart = () => {
+    console.log("Listening...");
+  };
+
+  recognitionInstance.onresult = (
+    event
+  ) => {
+    let transcript = "";
+
+    for (
+      let i = event.resultIndex;
+      i < event.results.length;
+      i++
+    ) {
+      transcript +=
+        event.results[i][0].transcript;
+    }
 
     setCurrentAnswer(
       (prev) =>
-        prev + " " + transcript
+        prev +
+        (prev ? " " : "") +
+        transcript
     );
   };
 
-  recognition.onend = () => {
+  recognitionInstance.onerror = (
+    event
+  ) => {
+    console.error(
+      "Speech Error:",
+      event.error
+    );
+
+    if (
+      event.error !== "no-speech" &&
+      event.error !== "aborted"
+    ) {
+      alert(
+        `Speech recognition error: ${event.error}`
+      );
+    }
+
     setIsListening(false);
   };
 
-  recognition.onerror = () => {
+  recognitionInstance.onend = () => {
     setIsListening(false);
   };
+};
+
+const stopListening = () => {
+  if (recognition) {
+    recognition.stop();
+    setIsListening(false);
+  }
 };
 
   return (
@@ -407,23 +453,45 @@ const startListening = () => {
       </div>
 
       {/* Voice Answer Button */}
-      <button
-        onClick={startListening}
-        style={{
-          marginTop: "10px",
-          padding: "10px 18px",
-          background: "#7c3aed",
-          color: "white",
-          border: "none",
-          borderRadius: "8px",
-          cursor: "pointer",
-          marginRight: "10px",
-        }}
-      >
-        {isListening
-          ? "Listening..."
-          : "🎤 Speak Answer"}
-      </button>
+      <div
+  style={{
+    display: "flex",
+    gap: "10px",
+    marginTop: "10px",
+  }}
+>
+  <button
+    onClick={startListening}
+    disabled={isListening}
+    style={{
+      padding: "10px 18px",
+      background: "#7c3aed",
+      color: "white",
+      border: "none",
+      borderRadius: "8px",
+      cursor: "pointer",
+    }}
+  >
+    {isListening
+      ? "Listening..."
+      : "🎤 Start Speaking"}
+  </button>
+
+  <button
+    onClick={stopListening}
+    disabled={!isListening}
+    style={{
+      padding: "10px 18px",
+      background: "#dc2626",
+      color: "white",
+      border: "none",
+      borderRadius: "8px",
+      cursor: "pointer",
+    }}
+  >
+    ⏹ Stop
+  </button>
+</div>
 
       {/* Next Button */}
       <button
