@@ -15,24 +15,7 @@ export async function generateQuestions(
   const prompt = `
 Generate 5 ${difficulty} level interview questions for a fresher applying for a ${topic} role.
 
-Difficulty Guidelines:
-
-Easy:
-- Basic concepts
-- Definitions
-- Beginner-friendly
-
-Medium:
-- Concept explanations
-- Practical understanding
-- Intermediate-level questions
-
-Hard:
-- Scenario-based questions
-- Deep technical concepts
-- Problem-solving questions
-
-Return ONLY the questions in this format:
+Return ONLY:
 
 1. Question
 2. Question
@@ -41,9 +24,7 @@ Return ONLY the questions in this format:
 5. Question
 `;
 
-  const result = await model.generateContent(
-    prompt
-  );
+  const result = await model.generateContent(prompt);
 
   return result.response.text();
 }
@@ -57,15 +38,13 @@ export async function evaluateAnswer(
   });
 
   const prompt = `
-You are an expert interview evaluator.
-
 Question:
 ${question}
 
 Candidate Answer:
 ${answer}
 
-Evaluate the answer and return in EXACTLY this format:
+Evaluate and return:
 
 Score: X/10
 
@@ -78,14 +57,10 @@ Weaknesses:
 - Point 2
 
 Improved Answer:
-(Provide a better answer)
-
-Keep the evaluation professional, concise, and useful.
+(Better answer)
 `;
 
-  const result = await model.generateContent(
-    prompt
-  );
+  const result = await model.generateContent(prompt);
 
   return result.response.text();
 }
@@ -100,43 +75,120 @@ export async function generateInterviewSummary(
   });
 
   const prompt = `
-You are a professional interview coach.
-
 Role: ${role}
 Difficulty: ${difficulty}
 
-Interview Feedback:
+Feedback:
 ${feedbacks}
 
-Create a final interview report.
+Create:
+
+Overall Performance
+
+Strengths
+
+Weaknesses
+
+Recommendations
+
+Final Verdict
+`;
+
+  const result = await model.generateContent(prompt);
+
+  return result.response.text();
+}
+
+export async function generateResumeQuestions(
+  resumeText
+) {
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
+  });
+
+  const prompt = `
+Analyze this resume and generate 5 professional interview questions.
+
+Resume:
+${resumeText}
+
+Rules:
+- Ask only from skills, projects, internship and technologies.
+- Mix technical and project questions.
+- Number every question.
 
 Format:
 
-Overall Performance:
-(Short paragraph)
+1. Question
+2. Question
+3. Question
+4. Question
+5. Question
+`;
+
+  const result = await model.generateContent(prompt);
+
+  return result.response.text();
+}
+
+export async function generateInterviewFeedback(
+  questions,
+  answers
+) {
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
+  });
+
+  const prompt = `
+You are a professional technical interviewer.
+
+Interview Questions:
+${questions.join("\n\n")}
+
+Candidate Answers:
+${answers.join("\n\n")}
+
+IMPORTANT:
+- Evaluate ONLY the candidate answers.
+- Do NOT evaluate the interview questions.
+- Do NOT praise the interviewer.
+- If answers are empty, missing, or very short, give a low score.
+- Score based on technical knowledge, clarity, confidence, and completeness.
+
+Return in this format:
+
+Overall Score: X/10
+
+Question-wise Evaluation:
+
+Question 1:
+Score: X/10
+Feedback:
+...
+
+Question 2:
+Score: X/10
+Feedback:
+...
 
 Strengths:
 - Point 1
 - Point 2
-- Point 3
 
 Weaknesses:
 - Point 1
 - Point 2
-- Point 3
 
-Recommendations:
+Suggestions:
 - Point 1
 - Point 2
-- Point 3
 
 Final Verdict:
-(2-3 lines)
+...
 `;
 
-  const result = await model.generateContent(
-    prompt
-  );
+  const result =
+    await model.generateContent(prompt);
 
   return result.response.text();
 }
