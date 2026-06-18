@@ -10,22 +10,29 @@ import {
 } from "recharts";
 
 function Dashboard() {
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] =
+    useState([]);
 
   useEffect(() => {
     const data =
-      JSON.parse(localStorage.getItem("interviews")) || [];
+      JSON.parse(
+        localStorage.getItem(
+          "interviews"
+        )
+      ) || [];
 
     setHistory(data);
   }, []);
 
-  const totalInterviews = history.length;
+  const totalInterviews =
+    history.length;
 
   const averageScore =
     totalInterviews > 0
       ? (
           history.reduce(
-            (sum, item) => sum + item.score,
+            (sum, item) =>
+              sum + item.score,
             0
           ) / totalInterviews
         ).toFixed(1)
@@ -33,13 +40,38 @@ function Dashboard() {
 
   const bestScore =
     totalInterviews > 0
-      ? Math.max(...history.map((item) => item.score))
+      ? Math.max(
+          ...history.map(
+            (item) => item.score
+          )
+        )
       : 0;
 
-  const chartData = history.map((item, index) => ({
-    attempt: `#${index + 1}`,
-    score: item.score,
-  }));
+  const latestInterview =
+    history.length > 0
+      ? history[
+          history.length - 1
+        ]
+      : null;
+
+  const chartData = history.map(
+    (item, index) => ({
+      attempt: `#${index + 1}`,
+      score: item.score,
+    })
+  );
+
+  const getScoreColor = (
+    score
+  ) => {
+    if (score >= 8)
+      return "#22c55e";
+
+    if (score >= 6)
+      return "#f59e0b";
+
+    return "#ef4444";
+  };
 
   return (
     <div
@@ -50,7 +82,11 @@ function Dashboard() {
         color: "white",
       }}
     >
-      <h1>📊 Performance Dashboard</h1>
+      <h1>
+        📊 Performance Dashboard
+      </h1>
+
+      {/* Statistics */}
 
       <div
         style={{
@@ -62,113 +98,281 @@ function Dashboard() {
       >
         <div
           style={{
-            background: "#1e293b",
+            background:
+              "#1e293b",
             padding: "20px",
-            borderRadius: "12px",
+            borderRadius:
+              "12px",
             minWidth: "220px",
           }}
         >
-          <h3>Total Interviews</h3>
-          <h2>{totalInterviews}</h2>
+          <h3>
+            Total Interviews
+          </h3>
+          <h2>
+            {
+              totalInterviews
+            }
+          </h2>
         </div>
 
         <div
           style={{
-            background: "#1e293b",
+            background:
+              "#1e293b",
             padding: "20px",
-            borderRadius: "12px",
+            borderRadius:
+              "12px",
             minWidth: "220px",
           }}
         >
-          <h3>Average Score</h3>
-          <h2>{averageScore}/10</h2>
+          <h3>
+            Average Score
+          </h3>
+          <h2>
+            {averageScore}/10
+          </h2>
         </div>
 
         <div
           style={{
-            background: "#1e293b",
+            background:
+              "#1e293b",
             padding: "20px",
-            borderRadius: "12px",
+            borderRadius:
+              "12px",
             minWidth: "220px",
           }}
         >
           <h3>Best Score</h3>
-          <h2>{bestScore}/10</h2>
+          <h2>
+            {bestScore}/10
+          </h2>
         </div>
       </div>
 
+      {/* Latest Interview */}
+
+      {latestInterview && (
+        <div
+          style={{
+            background:
+              "#1e293b",
+            marginTop: "30px",
+            padding: "20px",
+            borderRadius:
+              "12px",
+          }}
+        >
+          <h2>
+            🎯 Latest Interview
+          </h2>
+
+          <p>
+            <strong>
+              Date:
+            </strong>{" "}
+            {
+              latestInterview.date
+            }
+          </p>
+
+          <p>
+            <strong>
+              Questions:
+            </strong>{" "}
+            {
+              latestInterview.questionsCount
+            }
+          </p>
+
+          <h3
+            style={{
+              color:
+                getScoreColor(
+                  latestInterview.score
+                ),
+            }}
+          >
+            Score:{" "}
+            {
+              latestInterview.score
+            }
+            /10
+          </h3>
+        </div>
+      )}
+
+      {/* Chart */}
+
       <div
         style={{
-          background: "#1e293b",
+          background:
+            "#1e293b",
           marginTop: "40px",
           padding: "20px",
-          borderRadius: "12px",
+          borderRadius:
+            "12px",
         }}
       >
-        <h2>📈 Score Progress</h2>
+        <h2>
+          📈 Score Progress
+        </h2>
 
-        {chartData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={350}>
-            <LineChart data={chartData}>
+        {chartData.length >
+        0 ? (
+          <ResponsiveContainer
+            width="100%"
+            height={350}
+          >
+            <LineChart
+              data={
+                chartData
+              }
+            >
               <CartesianGrid strokeDasharray="3 3" />
+
               <XAxis dataKey="attempt" />
-              <YAxis domain={[0, 10]} />
+
+              <YAxis
+                domain={[
+                  0, 10,
+                ]}
+              />
+
               <Tooltip />
+
               <Line
                 type="monotone"
                 dataKey="score"
                 stroke="#38bdf8"
-                strokeWidth={3}
+                strokeWidth={
+                  3
+                }
               />
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <p>No interview data available.</p>
+          <p>
+            No interview
+            history
+            available.
+          </p>
         )}
       </div>
+
+      {/* History */}
 
       <div
         style={{
           marginTop: "40px",
-          background: "#1e293b",
+          background:
+            "#1e293b",
           padding: "20px",
-          borderRadius: "12px",
+          borderRadius:
+            "12px",
         }}
       >
-        <h2>Interview History</h2>
+        <h2>
+          Interview History
+        </h2>
 
-        {history.length === 0 ? (
-          <p>No interviews yet.</p>
+        {history.length ===
+        0 ? (
+          <p>
+            No interviews
+            found.
+          </p>
         ) : (
-          history.map((item, index) => (
-            <div
-              key={index}
-              style={{
-                marginBottom: "20px",
-                padding: "15px",
-                borderBottom:
-                  "1px solid rgba(255,255,255,0.1)",
-              }}
-            >
-              <p>
-                <strong>Role:</strong> {item.role}
-              </p>
+          history.map(
+            (
+              item,
+              index
+            ) => (
+              <div
+                key={index}
+                style={{
+                  background:
+                    "#334155",
+                  padding:
+                    "20px",
+                  borderRadius:
+                    "10px",
+                  marginTop:
+                    "20px",
+                }}
+              >
+                <h3>
+                  Attempt #
+                  {index + 1}
+                </h3>
 
-              <p>
-                <strong>Date:</strong> {item.date}
-              </p>
+                <p>
+                  <strong>
+                    Date:
+                  </strong>{" "}
+                  {
+                    item.date
+                  }
+                </p>
 
-              <p>
-                <strong>Score:</strong>{" "}
-                {item.score}/10
-              </p>
+                <p>
+                  <strong>
+                    Questions:
+                  </strong>{" "}
+                  {
+                    item.questionsCount
+                  }
+                </p>
 
-              <p>
-                <strong>Question:</strong>{" "}
-                {item.question}
-              </p>
-            </div>
-          ))
+                <h3
+                  style={{
+                    color:
+                      getScoreColor(
+                        item.score
+                      ),
+                  }}
+                >
+                  {
+                    item.score
+                  }
+                  /10
+                </h3>
+
+                <details
+                  style={{
+                    marginTop:
+                      "10px",
+                  }}
+                >
+                  <summary
+                    style={{
+                      cursor:
+                        "pointer",
+                    }}
+                  >
+                    View Full
+                    Report
+                  </summary>
+
+                  <pre
+                    style={{
+                      whiteSpace:
+                        "pre-wrap",
+                      marginTop:
+                        "10px",
+                      lineHeight:
+                        "1.7",
+                    }}
+                  >
+                    {
+                      item.report
+                    }
+                  </pre>
+                </details>
+              </div>
+            )
+          )
         )}
       </div>
     </div>

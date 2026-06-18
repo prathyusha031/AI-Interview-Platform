@@ -107,6 +107,44 @@ const handleSubmitInterview = async () => {
       );
 
     setFeedback(result);
+
+    // Extract Score
+    const scoreMatch =
+      result.match(
+        /Overall Score:\s*(\d+(\.\d+)?)\/10/i
+      );
+
+    const score = scoreMatch
+      ? Number(scoreMatch[1])
+      : 0;
+
+    // Interview Data
+    const interviewData = {
+      date: new Date().toLocaleString(),
+      score,
+      questionsCount:
+        questions.length,
+      report: result,
+    };
+
+    // Existing History
+    const existingData =
+      JSON.parse(
+        localStorage.getItem(
+          "interviews"
+        )
+      ) || [];
+
+    existingData.push(
+      interviewData
+    );
+
+    localStorage.setItem(
+      "interviews",
+      JSON.stringify(
+        existingData
+      )
+    );
   } catch (error) {
     console.error(error);
 
